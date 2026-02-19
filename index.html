@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A320 FLIGHT DECK FLOW PATTERN</title>
     <style>
         :root {
@@ -14,176 +14,198 @@
             --text: #FFFFFF;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             background-color: var(--p281c);
             color: var(--text);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Header & Logo */
+        /* --- RESPONSIVE HEADER --- */
         header {
             background-color: var(--p7696c);
             width: 100%;
-            padding: 20px 0;
+            padding: 15px;
             text-align: center;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             border-bottom: 4px solid var(--airbus-amber);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            padding-right: 50px; /* Space for logo */
         }
 
         .logo-img {
             position: absolute;
-            right: 20px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
-            height: 40px;
+            height: 35px;
             background: white;
-            padding: 5px;
-            border-radius: 4px;
+            padding: 3px;
+            border-radius: 3px;
         }
 
-        /* Layout Containers */
+        /* --- MAIN CONTAINER --- */
         .container {
-            width: 90%;
-            max-width: 1100px;
-            margin: 30px 0;
+            width: 95%;
+            max-width: 1000px;
+            margin: 15px auto;
             background-color: var(--ral7031);
-            padding: 30px;
-            border-radius: 15px;
-            display: none; /* Controlled by JS */
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .active { display: block; }
 
-        /* Home Page Grid */
+        /* --- MENU GRID (Responsive) --- */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
 
         .menu-card {
             background: var(--p7696c);
-            padding: 20px;
-            border-radius: 10px;
+            padding: 20px 10px;
+            border-radius: 8px;
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: bold;
+            font-size: 0.9rem;
             border: 2px solid transparent;
+            transition: 0.2s;
         }
 
-        .menu-card:hover {
-            border-color: var(--airbus-amber);
-            transform: translateY(-5px);
-        }
+        .menu-card:active { background: var(--airbus-amber); color: black; }
 
-        /* Quiz Styles */
+        /* --- FLOW COLUMNS (Desktop vs Mobile) --- */
         .flow-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            display: flex;
+            flex-direction: row; /* Default: Side by side */
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .flow-columns {
+                flex-direction: column; /* Mobile: Stacked */
+            }
+            header h1 { font-size: 1.1rem; }
         }
 
         .column {
-            background: rgba(0,0,0,0.25);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            flex: 1;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
         }
 
-        .column h2 { text-align: center; margin-top: 0; font-size: 1.1rem; }
+        .column h2 { 
+            text-align: center; 
+            font-size: 1rem; 
+            margin: 5px 0 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
         .pf-title { color: #00FF00; }
         .pm-title { color: #FFFF00; }
 
+        /* --- DRAGGABLE ITEMS --- */
         .sortable-list {
             list-style: none;
             padding: 0;
-            min-height: 300px;
+            margin: 0;
+            min-height: 50px;
         }
 
         .item {
             background-color: #f8f9fa;
             color: #2c3e50;
-            margin: 10px 0;
+            margin-bottom: 8px;
             padding: 12px;
             border-radius: 6px;
             cursor: grab;
             font-weight: bold;
             font-size: 0.85rem;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            touch-action: none; /* Crucial for mobile dragging */
+            user-select: none;
         }
 
-        .item.dragging { opacity: 0.4; }
+        .item.dragging { opacity: 0.4; background: var(--airbus-amber); }
 
-        /* Buttons */
+        /* --- BUTTONS --- */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
         .btn {
-            padding: 12px 25px;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
-            margin: 5px;
+            font-size: 0.8rem;
         }
 
-        .btn-main { background-color: var(--p7696c); color: white; }
-        .btn-verify { background-color: var(--airbus-amber); color: black; }
-        .btn-answer { background-color: #95a5a6; color: white; }
+        .btn-verify { background-color: var(--airbus-amber); color: black; width: 100%; max-width: 300px; }
         .btn-home { background-color: #e74c3c; color: white; }
+        .btn-main { background-color: var(--p7696c); color: white; }
 
-        /* Image Viewer */
-        .image-viewer {
-            text-align: center;
-            margin-top: 20px;
-        }
-
+        /* --- IMAGE SETTINGS --- */
         .image-viewer img {
-            max-width: 100%;
-            border: 5px solid var(--p7696c);
-            border-radius: 10px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 3px solid var(--p7696c);
         }
 
-        .answer-key-section {
-            margin-bottom: 50px;
-            border-bottom: 2px solid var(--airbus-amber);
-            padding-bottom: 20px;
-        }
+        #feedback { text-align: center; font-weight: bold; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>A320 FLIGHT DECK FLOW PATTERN</h1>
-    <img src="input_file_6.png" class="logo-img" alt="A320 Logo">
+    <img src="input_file_6.png" class="logo-img" alt="Logo">
 </header>
 
-<!-- 1. HOME SCREEN -->
+<!-- HOME SCREEN -->
 <div id="home-screen" class="container active">
-    <h2 style="text-align: center;">Select a Training Stage</h2>
+    <h3 style="text-align: center;">SELECT FLOW STAGE</h3>
     <div class="menu-grid">
-        <div class="menu-card" onclick="startQuiz(0)">1. Before Start Flow</div>
-        <div class="menu-card" onclick="startQuiz(1)">2. After Start Flow</div>
-        <div class="menu-card" onclick="startQuiz(2)">3. Line-Up Flow</div>
-        <div class="menu-card" onclick="startQuiz(3)">4. Acceleration Flow</div>
-        <div class="menu-card" onclick="startQuiz(4)">5. After Landing Flow</div>
-        <div class="menu-card" onclick="startQuiz(5)">6. Parking Flow</div>
+        <div class="menu-card" onclick="startQuiz(0)">1. BEFORE START</div>
+        <div class="menu-card" onclick="startQuiz(1)">2. AFTER START</div>
+        <div class="menu-card" onclick="startQuiz(2)">3. LINE-UP</div>
+        <div class="menu-card" onclick="startQuiz(3)">4. ACCEL</div>
+        <div class="menu-card" onclick="startQuiz(4)">5. AFTER LANDING</div>
+        <div class="menu-card" onclick="startQuiz(5)">6. PARKING</div>
     </div>
-    <div style="text-align: center; margin-top: 40px;">
-        <button class="btn btn-answer" onclick="showAllAnswers()">View All Correct Patterns</button>
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-main" onclick="showAllAnswers()">VIEW ALL ANSWERS</button>
     </div>
 </div>
 
-<!-- 2. QUIZ SCREEN -->
+<!-- QUIZ SCREEN -->
 <div id="quiz-screen" class="container">
-    <h2 id="quiz-title" style="color: var(--airbus-amber); text-align: center;"></h2>
+    <h3 id="quiz-title" style="color: var(--airbus-amber); text-align: center; margin-top: 0;"></h3>
     <div class="flow-columns">
         <div class="column">
             <h2 class="pf-title">PILOT FLYING (PF)</h2>
@@ -194,69 +216,39 @@
             <ul class="sortable-list" id="pm-list"></ul>
         </div>
     </div>
-    <div style="text-align: center; margin-top: 20px;">
-        <p id="feedback"></p>
-        <button class="btn btn-home" onclick="goHome()">Home</button>
+    <div id="feedback"></div>
+    <div class="controls">
         <button class="btn btn-verify" onclick="verifyQuiz()">Verify Sequence</button>
+        <button class="btn btn-home" onclick="goHome()">Home</button>
     </div>
 </div>
 
-<!-- 3. RESULT / IMAGE REVEAL -->
+<!-- IMAGE REVEAL SCREEN -->
 <div id="reveal-screen" class="container">
-    <h2 id="reveal-title" style="text-align: center;">Correct Pattern</h2>
+    <h3 id="reveal-title" style="text-align: center; margin-top:0;"></h3>
     <div class="image-viewer">
-        <img id="reveal-img" src="" alt="SOP Diagram">
+        <img id="reveal-img" src="" alt="Pattern">
     </div>
-    <div style="text-align: center; margin-top: 20px;">
-        <button class="btn btn-main" id="btn-next-step" onclick="nextStep()">Next Stage</button>
-        <button class="btn btn-home" onclick="goHome()">Back to Menu</button>
+    <div class="controls">
+        <button class="btn btn-main" id="btn-next" onclick="nextStep()">Next Stage</button>
+        <button class="btn btn-home" onclick="goHome()">Menu</button>
     </div>
 </div>
 
-<!-- 4. MASTER ANSWER KEY -->
+<!-- ANSWER KEY SCREEN -->
 <div id="answers-screen" class="container">
-    <button class="btn btn-home" onclick="goHome()" style="margin-bottom: 20px;">Back to Menu</button>
+    <button class="btn btn-home" onclick="goHome()" style="margin-bottom:15px;">Back</button>
     <div id="all-answers-content"></div>
 </div>
 
 <script>
     const stages = [
-        {
-            title: "BEFORE START FLOW PATTERN",
-            img: "input_file_0.png",
-            pf: ["BEACON sw...ON", "WINDOWS...CHECK CLOSED", "DOOR/SLIDES...CHECK CLOSED/ARMED", "THRUST LEVERS...IDLE", "PARK BRK handle...ON"],
-            pm: ["ATC...SET FOR OPERATIONS", "WINDOWS...CHECK CLOSED", "DOORS/SLIDES...CHECK CLOSED/ARMED"]
-        },
-        {
-            title: "AFTER START FLOW PATTERN",
-            img: "input_file_1.png",
-            pf: ["ENG MODE selector...NORM", "APU BLEED pb-sw...OFF", "ANTI ICE...AS RQRD", "APU MASTER SW pb-sw...OFF", "ECAM STATUS...CHECK", "NW STRG DISC MEMO...CHECK NOT DISPLAYED"],
-            pm: ["GND SPLRS...ARM", "RUD...CHECK NEUTRAL", "FLAPS...SET", "PITCH TRIM...SET", "ECAM STATUS...CHECK"]
-        },
-        {
-            title: "LINE-UP FLOW PATTERN",
-            img: "input_file_2.png",
-            pf: ["TAKEOFF RUNWAY...CONFIRM", "APPROACH PATH...CLEAR OF TRAFFIC", "EXTERIOR LIGHTS...SET"],
-            pm: ["TCAS mode selector...TA ONLY or TA/RA", "TAKEOFF RUNWAY...CONFIRM", "APPROACH PATH...CLEAR OF TRAFFIC", "PACKS 1 and 2...AS RQRD", "CABIN CREW...ADVISE"]
-        },
-        {
-            title: "ACCELERATION FLOW PATTERN",
-            img: "input_file_3.png",
-            pf: ["(No PF Actions)"],
-            pm: ["FLAPS ZERO...SELECT", "GND SPLRS...DISARM", "L/G...CHECK UP", "EXTERIOR LIGHTS...SET"]
-        },
-        {
-            title: "AFTER LANDING FLOW PATTERN",
-            img: "input_file_4.png",
-            pf: ["GND SPLRS...DISARM", "EXTERIOR LIGHTS...SET"],
-            pm: ["RADAR/PWS...OFF", "ENG MODE selector...NORM", "FLAPS...RETRACT", "TCAS/ATC...STDBY/AS RQRD", "APU...START", "ANTI ICE...AS RQRD"]
-        },
-        {
-            title: "PARKING FLOW PATTERN",
-            img: "input_file_5.png",
-            pf: ["ACCU PRESS...CHECK", "PARK BRK handle...ON", "YELLOW ELEC PUMP pb-sw...OFF", "ALL ENG MASTER LEVERS...OFF", "EXTERIOR LIGHTS...OFF", "SLIDES...CHECK DISARMED", "SEAT BELTS sw...OFF"],
-            pm: ["ANTI ICE...OFF", "APU BLEED pb-sw...AS RQRD", "FUEL PUMPS...OFF", "ATC...STBY", "IRS PERFORMANCE...CHECK", "FUEL QUANTITY...CHECK"]
-        }
+        { title: "BEFORE START FLOW", img: "input_file_0.png", pf: ["BEACON sw...ON", "WINDOWS...CHECK CLOSED", "DOOR/SLIDES...CHECK CLOSED/ARMED", "THRUST LEVERS...IDLE", "PARK BRK handle...ON"], pm: ["ATC...SET FOR OPERATIONS", "WINDOWS...CHECK CLOSED", "DOORS/SLIDES...CHECK CLOSED/ARMED"] },
+        { title: "AFTER START FLOW", img: "input_file_1.png", pf: ["ENG MODE selector...NORM", "APU BLEED pb-sw...OFF", "ANTI ICE...AS RQRD", "APU MASTER SW pb-sw...OFF", "ECAM STATUS...CHECK", "NW STRG DISC MEMO...CHECK NOT DISPLAYED"], pm: ["GND SPLRS...ARM", "RUD...CHECK NEUTRAL", "FLAPS...SET", "PITCH TRIM...SET", "ECAM STATUS...CHECK"] },
+        { title: "LINE-UP FLOW", img: "input_file_2.png", pf: ["TAKEOFF RUNWAY...CONFIRM", "APPROACH PATH...CLEAR OF TRAFFIC", "EXTERIOR LIGHTS...SET"], pm: ["TCAS mode selector...TA ONLY or TA/RA", "TAKEOFF RUNWAY...CONFIRM", "APPROACH PATH...CLEAR OF TRAFFIC", "PACKS 1 and 2...AS RQRD", "CABIN CREW...ADVISE"] },
+        { title: "ACCELERATION FLOW", img: "input_file_3.png", pf: ["(No PF Actions)"], pm: ["FLAPS ZERO...SELECT", "GND SPLRS...DISARM", "L/G...CHECK UP", "EXTERIOR LIGHTS...SET"] },
+        { title: "AFTER LANDING FLOW", img: "input_file_4.png", pf: ["GND SPLRS...DISARM", "EXTERIOR LIGHTS...SET"], pm: ["RADAR/PWS...OFF", "ENG MODE selector...NORM", "FLAPS...RETRACT", "TCAS/ATC...STDBY/AS RQRD", "APU...START", "ANTI ICE...AS RQRD"] },
+        { title: "PARKING FLOW", img: "input_file_5.png", pf: ["ACCU PRESS...CHECK", "PARK BRK handle...ON", "YELLOW ELEC PUMP pb-sw...OFF", "ALL ENG MASTER LEVERS...OFF", "EXTERIOR LIGHTS...OFF", "SLIDES...CHECK DISARMED", "SEAT BELTS sw...OFF"], pm: ["ANTI ICE...OFF", "APU BLEED pb-sw...AS RQRD", "FUEL PUMPS...OFF", "ATC...STBY", "IRS PERFORMANCE...CHECK", "FUEL QUANTITY...CHECK"] }
     ];
 
     let currentStage = 0;
@@ -287,18 +279,31 @@
             li.draggable = true;
             li.innerText = text;
             li.dataset.val = text;
+            
+            // Touch & Mouse Events
             li.addEventListener('dragstart', () => li.classList.add('dragging'));
             li.addEventListener('dragend', () => li.classList.remove('dragging'));
+            li.addEventListener('touchstart', (e) => { li.classList.add('dragging'); }, {passive: true});
+            li.addEventListener('touchend', (e) => { li.classList.remove('dragging'); }, {passive: true});
+
             list.appendChild(li);
         });
-        list.addEventListener('dragover', e => {
+
+        // Responsive Drag/Touch Logic
+        const handleMove = (e) => {
             e.preventDefault();
             const dragging = document.querySelector('.dragging');
+            if(!dragging) return;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
             const afterElement = [...list.querySelectorAll('.item:not(.dragging)')].find(el => {
-                return e.clientY <= el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2;
+                const box = el.getBoundingClientRect();
+                return clientY <= box.top + box.height / 2;
             });
             afterElement ? list.insertBefore(dragging, afterElement) : list.appendChild(dragging);
-        });
+        };
+
+        list.addEventListener('dragover', handleMove);
+        list.addEventListener('touchmove', handleMove, {passive: false});
     }
 
     function verifyQuiz() {
@@ -308,44 +313,30 @@
 
         if (JSON.stringify(pfOrder) === JSON.stringify(correct.pf) && JSON.stringify(pmOrder) === JSON.stringify(correct.pm)) {
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            const reveal = document.getElementById('reveal-screen');
-            reveal.classList.add('active');
+            document.getElementById('reveal-screen').classList.add('active');
             document.getElementById('reveal-img').src = correct.img;
-            document.getElementById('reveal-title').innerText = "SUCCESS: " + correct.title;
-            document.getElementById('btn-next-step').innerText = currentStage < 5 ? "Next Stage" : "Finish & Restart";
+            document.getElementById('reveal-title').innerText = "CORRECT: " + correct.title;
+            document.getElementById('btn-next').innerText = currentStage < 5 ? "Next Stage" : "Finish";
         } else {
-            document.getElementById('feedback').innerHTML = "<b style='color:#ff6b6b'>INCORRECT. Check pattern sequence.</b>";
+            document.getElementById('feedback').innerHTML = "<span style='color:#ff6b6b'>INCORRECT ORDER</span>";
         }
     }
 
     function nextStep() {
-        if (currentStage < 5) {
-            startQuiz(currentStage + 1);
-        } else {
-            goHome();
-        }
+        currentStage < 5 ? startQuiz(currentStage + 1) : goHome();
     }
 
     function showAllAnswers() {
         document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-        const screen = document.getElementById('answers-screen');
-        screen.classList.add('active');
+        document.getElementById('answers-screen').classList.add('active');
         const content = document.getElementById('all-answers-content');
-        content.innerHTML = "";
-
-        stages.forEach(s => {
-            content.innerHTML += `
-                <div class="answer-key-section">
-                    <h3>${s.title}</h3>
-                    <img src="${s.img}" style="max-width:100%; border-radius:10px;">
-                    <div class="flow-columns" style="margin-top:15px;">
-                        <div><h4 class="pf-title">PF</h4><small>${s.pf.join('<br>')}</small></div>
-                        <div><h4 class="pm-title">PM</h4><small>${s.pm.join('<br>')}</small></div>
-                    </div>
-                </div>`;
-        });
+        content.innerHTML = stages.map(s => `
+            <div style="border-bottom:2px solid gold; margin-bottom:20px; padding-bottom:10px;">
+                <h4 style="margin:0;">${s.title}</h4>
+                <img src="${s.img}" style="width:100%; border-radius:5px; margin:10px 0;">
+            </div>
+        `).join('');
     }
 </script>
-
 </body>
 </html>
